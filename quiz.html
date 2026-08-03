@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ojas — Find your hair ritual</title>
+<meta name="description" content="Take a free 2-minute hair assessment and get a personalised Ayurvedic routine.">
+<style>
+:root{--bg:#faf7f2;--card:#fff;--ink:#1f2421;--muted:#6b7772;--faint:#9aa5a0;--line:#e7e1d7;--primary:#2f6d4f;--accent:#d98a2b;--ring:#2f6d4f;--sans:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;--serif:Georgia,serif}
+@media (prefers-color-scheme:dark){:root{--bg:#14110c;--card:#1d1913;--ink:#f1ebe0;--muted:#b0a595;--faint:#7c7364;--line:#2c261d}}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;-webkit-font-smoothing:antialiased}
+.wrap{max-width:760px;margin:0 auto;padding:0 22px}a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:14px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-size:15px;font-weight:600;padding:14px 24px;border-radius:10px;transition:transform .08s,filter .2s,border-color .2s}
+.btn:active{transform:translateY(1px)}.btn-primary{background:var(--primary);color:#fff}.btn-primary:hover{filter:brightness(1.07)}.btn-ghost{border:1.5px solid var(--line);color:var(--ink)}.btn-ghost:hover{border-color:var(--primary)}
+:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
+nav{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:60px;max-width:760px;margin:0 auto;padding:0 22px}
+.brandmark{font-family:var(--serif);font-size:20px;font-weight:700}.brandmark .dot{color:var(--accent)}.nav-tag{font-size:12px;color:var(--faint)}
+main{padding:44px 0 90px;min-height:calc(100vh - 60px)}.screen{display:none}.screen.on{display:block;animation:fade .45s ease}@keyframes fade{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:none}}
+.hero-h{font-family:var(--serif);font-size:clamp(32px,6vw,52px);line-height:1.05;letter-spacing:-.02em;margin-bottom:16px}.hero-p{font-size:17px;color:var(--muted);max-width:520px;margin-bottom:30px}
+.concerns{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:26px}@media(max-width:560px){.concerns{grid-template-columns:1fr}}
+.concern{display:flex;gap:14px;align-items:center;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:18px;transition:border-color .2s,transform .08s}.concern:hover{border-color:var(--primary)}.concern:active{transform:translateY(1px)}
+.concern .ic{font-size:26px;width:44px;height:44px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--primary) 12%,transparent);border-radius:11px}.concern .l{font-weight:600;font-size:16px}.concern .s{font-size:13px;color:var(--muted)}
+.trust{display:flex;gap:22px;flex-wrap:wrap;color:var(--faint);font-size:13px;margin-top:8px}.trust b{color:var(--muted)}
+.q-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}.q-step{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}.q-step b{color:var(--primary)}.q-back{font-size:13px;color:var(--faint)}.q-back:hover{color:var(--ink)}
+.track{height:6px;background:var(--line);border-radius:99px;overflow:hidden;margin-bottom:36px}.fill{height:100%;background:var(--primary);width:0;transition:width .4s cubic-bezier(.4,0,.2,1)}
+.q-q{font-family:var(--serif);font-size:clamp(24px,4.4vw,34px);line-height:1.15;margin-bottom:8px}.q-help{color:var(--muted);margin-bottom:26px}
+.opts{display:grid;gap:12px}.opt{display:flex;align-items:center;gap:14px;text-align:left;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:17px 18px;font-size:16px;transition:border-color .2s,background .2s}.opt:hover{border-color:var(--primary)}.opt.sel{border-color:var(--primary);background:color-mix(in srgb,var(--primary) 8%,transparent)}
+.opt .rad{flex:0 0 auto;width:20px;height:20px;border-radius:50%;border:2px solid var(--line);position:relative}.opt.sel .rad{border-color:var(--primary)}.opt.sel .rad::after{content:"";position:absolute;inset:4px;border-radius:50%;background:var(--primary)}
+.lead-card{background:var(--card);border:1.5px solid var(--line);border-radius:16px;padding:34px 30px}.lead-h{font-family:var(--serif);font-size:clamp(24px,4.4vw,32px);margin-bottom:10px}.lead-p{color:var(--muted);margin-bottom:24px}
+.field{margin-bottom:14px}.field input{width:100%;background:var(--bg);border:1.5px solid var(--line);border-radius:10px;padding:14px 16px;font-family:inherit;font-size:15px;color:var(--ink)}.field input:focus{outline:none;border-color:var(--primary)}
+.consent{display:flex;gap:11px;align-items:flex-start;font-size:13px;color:var(--muted);margin-bottom:22px}.consent input{margin-top:3px;flex:0 0 auto;width:17px;height:17px;accent-color:var(--primary)}
+.err{color:#c0554e;font-size:13px;margin-bottom:14px;display:none}.lead-alt{margin-top:16px;font-size:13px;color:var(--faint);text-align:center}.lead-alt button{text-decoration:underline}
+.r-h{font-family:var(--serif);font-size:clamp(26px,5vw,40px);line-height:1.08;margin:12px 0}.r-why{color:var(--muted);max-width:560px;margin-bottom:26px}
+.rec{background:var(--card);border:2px solid var(--primary);border-radius:16px;padding:26px;margin-bottom:14px}.rec .k{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--primary);font-weight:700;margin-bottom:10px}.rec h3{font-family:var(--serif);font-size:24px;margin-bottom:8px}.rec .benefit{color:var(--muted);margin-bottom:20px}
+.rec .foot{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}.rec .price{font-family:var(--serif);font-size:26px;color:var(--primary);font-weight:700}.rec .price small{display:block;font-size:11px;color:var(--faint);font-weight:400}
+.addons-h{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:26px 0 12px}.addon{display:flex;gap:16px;align-items:center;background:var(--card);border:1.5px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:10px}.addon .body{flex:1;min-width:0}.addon h4{font-family:var(--serif);font-size:17px;margin-bottom:2px}.addon p{font-size:13px;color:var(--muted)}.addon .p{font-weight:700;color:var(--primary);white-space:nowrap}
+.r-cta{display:flex;gap:12px;margin-top:28px;flex-wrap:wrap}.disclaimer{margin-top:26px;font-size:12px;color:var(--faint);border-top:1px solid var(--line);padding-top:18px;max-width:600px}.disclaimer b{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav><div class="nav-in"><a href="/" class="brandmark">Ojas<span class="dot">.</span></a><div class="nav-tag">Ayurveda, personalised</div></div></nav>
+<main><div class="wrap">
+<section class="screen on" id="intro"><div class="eyebrow">Free 2-minute hair assessment</div><h1 class="hero-h">Find your Ojas hair ritual</h1><p class="hero-p">Tell us about your hair and scalp, and we will match you to the right Ayurvedic routine — honest care, no miracle promises.</p><div class="concerns" id="concernGrid"></div><div class="trust"><span>✓ <b>2 minutes</b></span><span>✓ <b>Personalised</b></span><span>✓ <b>Honest</b> — no false promises</span></div></section>
+<section class="screen" id="quiz"><div class="q-top"><span class="q-step">Question <b id="qNow">1</b> / <span id="qTotal">3</span></span><button class="q-back" id="backBtn" style="visibility:hidden">← Back</button></div><div class="track"><div class="fill" id="fill"></div></div><h2 class="q-q" id="qQ"></h2><p class="q-help" id="qHelp"></p><div class="opts" id="opts"></div></section>
+<section class="screen" id="lead"><div class="lead-card"><div class="eyebrow">Almost there</div><h2 class="lead-h">Where should we send your ritual?</h2><p class="lead-p">Get your personalised Ojas routine plus a first-order offer. Unsubscribe anytime.</p><div class="field"><input type="text" id="nameInput" placeholder="First name" autocomplete="given-name"></div><div class="field"><input type="email" id="emailInput" placeholder="you@email.com" autocomplete="email" inputmode="email"></div><label class="consent"><input type="checkbox" id="consentBox"><span>I agree to receive my results and occasional emails, and accept the privacy policy. (Required — DPDP Act.)</span></label><div class="err" id="leadErr">Please enter a valid email and tick the consent box.</div><button class="btn btn-primary" id="leadSubmit" style="width:100%">Show my results →</button><div class="lead-alt"><button id="skipLead">Skip and just show me</button></div></div></section>
+<section class="screen" id="result"></section>
+</div></main>
+<script>
+var CONFIG = {
+  currency:"INR", locale:"en-IN", pixelId:"", leadEndpoint:"/api/lead",
+  shop:{ domain:"" },
+  products:{
+    strength:{ id:"ojas-strength", variantId:"", name:"Ojas Root Strength Oil (example)", price:599, benefit:"A classical pre-wash oil to condition roots and support stronger, fuller-looking hair." },
+    nourish:{ id:"ojas-nourish", variantId:"", name:"Ojas Nourish & Shine Oil (example)", price:649, benefit:"For dry, rough lengths — supports softness and shine." },
+    cleanse:{ id:"ojas-cleanse", variantId:"", name:"Ojas Herbal Clarify Cleanse (example)", price:499, benefit:"Clears scalp buildup without stripping." }
+  },
+  concern:{ icon:"🌿", label:"Hair & scalp", sub:"Fuller-looking, less breakage", goalTag:"the look and strength of your hair" },
+  questions:[
+    { q:"How does your hair feel lately?", help:"Pick what fits best.", opts:[ {l:"Thinner-looking than before", w:{strength:2}}, {l:"Dry, rough or brittle", w:{nourish:2}}, {l:"Oily roots / buildup", w:{cleanse:2}}, {l:"Mostly fine, want to maintain", w:{strength:1}} ]},
+    { q:"Your scalp on a normal day?", help:"Between washes.", opts:[ {l:"Oily and weighed down", w:{cleanse:2}}, {l:"Dry or tight", w:{nourish:1}}, {l:"Comfortable", w:{strength:1}} ]},
+    { q:"Breakage when you brush or wash?", help:"", opts:[ {l:"Yes, noticeably", w:{strength:2}}, {l:"A little", w:{strength:1,nourish:1}}, {l:"Not really", w:{nourish:1}} ]}
+  ]
+};
+var state={i:0,answers:[],lead:null};
+function $(id){return document.getElementById(id);}
+function show(id){var s=document.querySelectorAll(".screen");for(var k=0;k<s.length;k++)s[k].classList.remove("on");$(id).classList.add("on");window.scrollTo({top:0,behavior:"auto"});}
+function reduce(){return window.matchMedia&&window.matchMedia("(prefers-reduced-motion:reduce)").matches;}
+function money(n){try{return "₹"+n.toLocaleString(CONFIG.locale);}catch(e){return "₹"+n;}}
+function productById(id){var o=null;Object.keys(CONFIG.products).forEach(function(k){if(CONFIG.products[k].id===id)o=CONFIG.products[k];});return o;}
+var ATTR=(function(){var p=new URLSearchParams(location.search),o={};["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid","ref"].forEach(function(k){if(p.get(k))o[k]=p.get(k);});try{var pv=JSON.parse(localStorage.getItem("ojasAttr")||"{}");o=Object.assign(pv,o);localStorage.setItem("ojasAttr",JSON.stringify(o));}catch(e){}return o;})();
+(function initPixel(){if(!CONFIG.pixelId)return;!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version="2.0";n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,"script","https://connect.facebook.net/en_US/fbevents.js");window.fbq("init",CONFIG.pixelId);window.fbq("track","PageView");})();
+function track(evt,data){if(window.fbq)window.fbq("track",evt,data||{});}
+(function(){var g=$("concernGrid");var c=CONFIG.concern;var b=document.createElement("button");b.className="concern";b.innerHTML='<span class="ic">'+c.icon+'</span><span><span class="l"></span><br><span class="s"></span></span>';b.querySelector(".l").textContent=c.label;b.querySelector(".s").textContent=c.sub;b.addEventListener("click",start);g.appendChild(b);})();
+function start(){state.i=0;state.answers=[];$("qTotal").textContent=CONFIG.questions.length;track("ViewContent",{content_name:"hair-quiz"});renderQuestion();show("quiz");}
+function renderQuestion(){var q=CONFIG.questions[state.i];$("qNow").textContent=state.i+1;$("qQ").textContent=q.q;$("qHelp").textContent=q.help||"";$("qHelp").style.display=q.help?"block":"none";$("fill").style.width=(state.i/(CONFIG.questions.length+1)*100)+"%";$("backBtn").style.visibility=state.i===0?"hidden":"visible";var box=$("opts");box.innerHTML="";q.opts.forEach(function(opt){var b=document.createElement("button");b.className="opt"+(state.answers[state.i]===opt?" sel":"");b.innerHTML='<span class="rad"></span><span class="t"></span>';b.querySelector(".t").textContent=opt.l;b.addEventListener("click",function(){choose(opt);});box.appendChild(b);});}
+function choose(opt){state.answers[state.i]=opt;var btns=$("opts").querySelectorAll(".opt"),q=CONFIG.questions[state.i];for(var k=0;k<btns.length;k++)btns[k].classList.toggle("sel",q.opts[k]===opt);var go=function(){if(state.i<CONFIG.questions.length-1){state.i++;renderQuestion();}else{openLead();}};reduce()?go():setTimeout(go,240);}
+$("backBtn").addEventListener("click",function(){if(state.i>0){state.i--;renderQuestion();}});
+function openLead(){$("fill").style.width=(CONFIG.questions.length/(CONFIG.questions.length+1)*100)+"%";show("lead");}
+function submitLead(skip){var email=$("emailInput").value.trim(),name=$("nameInput").value.trim();var ok=/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);if(!skip){if(!ok||!$("consentBox").checked){$("leadErr").style.display="block";return;}var payload={track:"hair",name:name,email:email,consent:true,answers:state.answers.map(function(a){return a.l;}),attr:ATTR};track("Lead",{content_name:"hair-quiz"});try{localStorage.setItem("ojasLead",JSON.stringify(payload));}catch(e){}if(CONFIG.leadEndpoint){try{fetch(CONFIG.leadEndpoint,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify(payload)});}catch(e){}}state.lead={name:name,email:email};}$("fill").style.width="100%";renderResult();show("result");}
+function computeRec(){var score={strength:0,nourish:0,cleanse:0};state.answers.forEach(function(a){if(a&&a.w)for(var k in a.w)if(k in score)score[k]+=a.w[k];});var rank=Object.keys(score).sort(function(a,b){return score[b]-score[a];});return {primary:CONFIG.products[rank[0]],addons:rank.slice(1).map(function(k){return CONFIG.products[k];})};}
+function addToCart(id){track("AddToCart",{content_ids:[id],currency:CONFIG.currency});var p=productById(id);if(CONFIG.shop&&CONFIG.shop.domain&&p&&p.variantId){window.location.href="https://"+CONFIG.shop.domain+"/cart/"+p.variantId+":1";}else{alert("Connect Shopify — set CONFIG.shop.domain and this product's variantId to enable checkout.");}}
+function renderResult(){var rec=computeRec(),hi=state.lead&&state.lead.name?(", "+state.lead.name):"";var addons=rec.addons.map(function(p){return '<div class="addon"><div class="body"><h4>'+p.name+'</h4><p>'+p.benefit+'</p></div><div class="p">'+money(p.price)+'</div></div>';}).join("");$("result").innerHTML='<div class="eyebrow">Your personalised match</div>'+'<h2 class="r-h">Here is where we would start'+hi+'.</h2>'+'<p class="r-why">Based on your answers, we built this around <b>'+CONFIG.concern.goalTag+'</b>. Start with the core, add the rest when you are ready.</p>'+'<div class="rec"><div class="k">Start here</div><h3>'+rec.primary.name+'</h3><p class="benefit">'+rec.primary.benefit+'</p><div class="foot"><div class="price">'+money(rec.primary.price)+'<small>one-time or subscribe</small></div><a class="btn btn-primary" href="#" data-buy="'+rec.primary.id+'">Add to cart →</a></div></div>'+(addons?'<div class="addons-h">Complete your routine</div>'+addons:'')+'<div class="r-cta"><a class="btn btn-primary" href="#" data-buy="'+rec.primary.id+'">Shop my routine →</a><button class="btn btn-ghost" id="restartBtn">Start over</button></div>'+'<p class="disclaimer"><b>A note on claims.</b> These products <b>support</b> a routine — they are not medicines and are not intended to diagnose, treat, cure or prevent any disease. Results vary. Prices and products shown are examples.</p>';$("restartBtn").addEventListener("click",restart);var buys=$("result").querySelectorAll("[data-buy]");for(var k=0;k<buys.length;k++)buys[k].addEventListener("click",function(e){e.preventDefault();addToCart(this.getAttribute("data-buy"));});}
+function restart(){state={i:0,answers:[],lead:null};$("emailInput").value="";$("nameInput").value="";$("consentBox").checked=false;$("leadErr").style.display="none";show("intro");}
+$("leadSubmit").addEventListener("click",function(){submitLead(false);});
+$("skipLead").addEventListener("click",function(){submitLead(true);});
+$("emailInput").addEventListener("keydown",function(e){if(e.key==="Enter")submitLead(false);});
+</script>
+</body>
+</html>
