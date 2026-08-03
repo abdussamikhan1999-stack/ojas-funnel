@@ -6,11 +6,6 @@
 <title>Ojas — Find your hair ritual</title>
 <meta name="description" content="Take a free 2-minute hair assessment and get a personalised Ayurvedic routine — honest care, no miracle promises.">
 <style>
-/* ============================================================================
-   LEAD-TO-SALE FUNNEL SYSTEM  —  product-agnostic, single-file, no build.
-   Edit ONLY the CONFIG object (in the script) to rebrand / add products.
-   COMPLIANCE: keep product `benefit` lines to support/appearance framing.
-   ============================================================================ */
 :root{
   --bg:#faf7f2; --card:#ffffff; --ink:#1f2421; --muted:#6b7772; --faint:#9aa5a0;
   --line:#e7e1d7; --primary:#2f6d4f; --accent:#d98a2b; --ring:#2f6d4f;
@@ -144,14 +139,14 @@ main{padding:44px 0 90px;min-height:calc(100vh - 60px)}
   </div>
 </main>
 <script>
-/* ============ CONFIG — EDIT THIS BLOCK ONLY ============ */
 var CONFIG = {
   brand: "Ojas",
   tagline: "Ayurveda, personalised",
   currency: "INR",
   locale: "en-IN",
-  pixelId: "",                // paste your Meta Pixel ID to enable events
-  leadEndpoint: "/api/lead",  // leads POST here; api/lead.js returns ok even before an ESP is connected
+  pixelId: "",
+  leadEndpoint: "/api/lead",
+  shop: { domain: "" },       // e.g. "ojasoil.myshopify.com" or your domain — set to enable real Shopify checkout
   theme: { primary:"#2f6d4f", accent:"#d98a2b" },
   intro: {
     eyebrow: "Free 2-minute hair assessment",
@@ -164,7 +159,6 @@ var CONFIG = {
     sub: "Get your personalised Ojas routine plus a first-order offer. Unsubscribe anytime.",
     consent: "I agree to receive my results and occasional emails, and accept the privacy policy. (Required — consent is mandatory under India's DPDP Act.)"
   },
-  /* NOTE: products below are EXAMPLES — replace with your real Ojas Oil catalogue. */
   tracks: {
     hair: {
       icon:"🌿", label:"Hair & scalp", sub:"Fuller-looking, less breakage",
@@ -178,14 +172,13 @@ var CONFIG = {
           opts:[ {l:"Yes, noticeably", w:{strength:2}}, {l:"A little", w:{strength:1,nourish:1}}, {l:"Not really", w:{nourish:1}} ]}
       ],
       products:{
-        strength:{ id:"ojas-strength", name:"Ojas Root Strength Oil (example)", price:599, benefit:"A classical pre-wash oil to condition roots and support stronger, fuller-looking hair." },
-        nourish:{ id:"ojas-nourish", name:"Ojas Nourish & Shine Oil (example)", price:649, benefit:"For dry, rough lengths — supports softness and shine." },
-        cleanse:{ id:"ojas-cleanse", name:"Ojas Herbal Clarify Cleanse (example)", price:499, benefit:"Clears scalp buildup without stripping." }
+        strength:{ id:"ojas-strength", variantId:"", name:"Ojas Root Strength Oil (example)", price:599, benefit:"A classical pre-wash oil to condition roots and support stronger, fuller-looking hair." },
+        nourish:{ id:"ojas-nourish", variantId:"", name:"Ojas Nourish & Shine Oil (example)", price:649, benefit:"For dry, rough lengths — supports softness and shine." },
+        cleanse:{ id:"ojas-cleanse", variantId:"", name:"Ojas Herbal Clarify Cleanse (example)", price:499, benefit:"Clears scalp buildup without stripping." }
       }
     }
   }
 };
-/* ============ END CONFIG ============ */
 
 function applyConfig(){
   document.documentElement.style.setProperty("--primary", CONFIG.theme.primary);
@@ -209,6 +202,7 @@ function $(id){ return document.getElementById(id); }
 function show(id){ var s=document.querySelectorAll(".screen"); for(var k=0;k<s.length;k++) s[k].classList.remove("on"); $(id).classList.add("on"); window.scrollTo({top:0,behavior:"auto"}); }
 function reduce(){ return window.matchMedia && window.matchMedia("(prefers-reduced-motion:reduce)").matches; }
 function money(n){ try{ return "₹"+n.toLocaleString(CONFIG.locale); }catch(e){ return "₹"+n; } }
+function productById(id){ var out=null; Object.keys(TRACKS).forEach(function(k){ var ps=TRACKS[k].products; Object.keys(ps).forEach(function(pk){ if(ps[pk].id===id) out=ps[pk]; }); }); return out; }
 
 var ATTR=(function(){var p=new URLSearchParams(location.search),o={};["utm_source","utm_medium","utm_campaign","utm_content","utm_term","fbclid","ref"].forEach(function(k){if(p.get(k))o[k]=p.get(k);});try{var pv=JSON.parse(localStorage.getItem("funnelAttr")||"{}");o=Object.assign(pv,o);localStorage.setItem("funnelAttr",JSON.stringify(o));}catch(e){}return o;})();
 
@@ -263,6 +257,15 @@ function computeRec(){
   var rank=Object.keys(score).sort(function(a,b){ return score[b]-score[a]; });
   return { primary:t.products[rank[0]], addons:rank.slice(1).map(function(k){ return t.products[k]; }).filter(Boolean) };
 }
+function addToCart(id){
+  track("AddToCart",{content_ids:[id],currency:CONFIG.currency});
+  var p=productById(id);
+  if(CONFIG.shop && CONFIG.shop.domain && p && p.variantId){
+    window.location.href="https://"+CONFIG.shop.domain+"/cart/"+p.variantId+":1";
+  } else {
+    alert("Connect Shopify — set CONFIG.shop.domain and this product's variantId to enable real checkout.");
+  }
+}
 function renderResult(){
   var t=TRACKS[state.track], rec=computeRec(), hi=state.lead&&state.lead.name?(", "+state.lead.name):"";
   var addons=rec.addons.map(function(p){ return '<div class="addon"><div class="body"><h4>'+p.name+'</h4><p>'+p.benefit+'</p></div><div class="p">'+money(p.price)+'</div></div>'; }).join("");
@@ -279,7 +282,7 @@ function renderResult(){
     '<p class="disclaimer"><b>A note on claims.</b> These products <b>support</b> a routine — they are not medicines and are not intended to diagnose, treat, cure or prevent any disease. Results vary. Your match reflects only the answers you gave. Prices and products shown are examples.</p>';
   $("restartBtn").addEventListener("click", restart);
   var buys=$("result").querySelectorAll("[data-buy]");
-  for(var k=0;k<buys.length;k++) buys[k].addEventListener("click", function(e){ e.preventDefault(); var id=this.getAttribute("data-buy"); track("AddToCart",{content_ids:[id],currency:CONFIG.currency}); alert("Prototype — this would add "+id+" to cart / go to checkout."); });
+  for(var k=0;k<buys.length;k++) buys[k].addEventListener("click", function(e){ e.preventDefault(); addToCart(this.getAttribute("data-buy")); });
 }
 function restart(){ state={track:null,i:0,answers:[],lead:null}; $("emailInput").value=""; $("nameInput").value=""; $("consentBox").checked=false; $("leadErr").style.display="none"; show("intro"); }
 
