@@ -30,7 +30,13 @@ vercel.json     cleanUrls: true (so /quiz -> quiz.html)
 
 No build/lint/test. To preview locally: `npx serve .` (or open the `.html` files directly — the funnel works without a backend; `/api/lead` just no-ops locally).
 
-Deploy target is **Vercel**, git-connected (importing this repo). Once connected, every push to `main` auto-deploys. `api/lead.js` is auto-detected as a serverless function. Server-side secrets (Klaviyo key, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
+Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless function; `vercel.json` gives clean URLs. Server-side secrets (Klaviyo key, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
+
+**Deployment reality (important — not yet ideal):**
+- This repo is **NOT git-connected to Vercel**, so commits here do **not** auto-deploy. The durable fix is to Import the repo in the Vercel dashboard (git-connect); until then, deploys are manual.
+- There are **two** Vercel projects under team `s-brand`: `ojas-funnel` (an early single-page deploy) and `ojas-site` (the full multi-page site). `ojas-site` is the intended live project.
+- Deploys were made by pushing files directly to Vercel (via the Vercel MCP `deploy_to_vercel`), not from git. The connector could create new projects but was **403-forbidden from updating** an existing one — so a fresh project name was used. Prefer git-connect for anything durable.
+- New Vercel projects default to **Deployment Protection ON** (Vercel Authentication) — the public URL 302-redirects to an SSO login until it is turned **off** in Settings → Deployment Protection.
 
 ## The config-driven pattern (important)
 
