@@ -4,31 +4,41 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Ojas** — a lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand (India / INR). Static single-file HTML pages plus one Vercel serverless function. **No build step, no framework, no tests.** Everything is vanilla HTML/CSS/JS designed to deploy to Vercel as-is.
+**Ojas** — a lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand (India / INR). Static single-file HTML pages plus one Vercel serverless function. **No build step, no package.json, no framework, no tests.** Everything is vanilla HTML/CSS/JS designed to deploy to Vercel as-is.
 
 The business model (see `docs/FUNNEL-SYSTEM.md`): Meta/Instagram traffic → quiz captures a **lead** → email nurture → **sale** via Shopify. This repo is the funnel + storefront half; commerce (checkout, payments, subscriptions) is delegated to Shopify + Razorpay.
 
-## Layout (final structure)
+## Layout
 
 ```
 index.html      Storefront HOMEPAGE (served at /)
-quiz.html       The quiz funnel (served at /quiz) — the lead-gen engine
+quiz.html       The quiz funnel (served at /quiz) — the lead-gen engine, holds CONFIG
 product.html    Product page (served at /product)
+privacy|terms|refund|shipping.html   Rendered policy pages (served at /privacy, …)
 api/lead.js     Vercel serverless function: receives quiz leads, forwards to ESP
-content/legal/  Privacy, Terms, Refund, Shipping — policy drafts (templates)
+content/legal/  Markdown source/drafts for the four policy pages
 content/copy/   Storefront copy
 content/email/  Klaviyo flow copy
 docs/FUNNEL-SYSTEM.md   The product-agnostic operating manual
-SETUP.md        "Built vs. fill-later" dependency checklist — READ THIS FIRST
-vercel.json     cleanUrls: true (so /quiz -> quiz.html)
+SETUP.md        "Built vs. fill-later" dependency checklist
+vercel.json     cleanUrls + trailingSlash:false (so /quiz -> quiz.html)
 .env.example    Names of the server-side secrets (values live in Vercel only)
 ```
 
-`store/` is a **stale earlier copy** of the homepage/product page (pre-restructure). The root `index.html` / `product.html` are canonical; ignore or delete `store/`.
+Two things in the tree are **not** live code:
+
+- `store/` is a **stale earlier copy** of the homepage/product page (pre-restructure, un-minified). The root `index.html` / `product.html` are canonical; ignore or delete `store/`.
+- `.claude/worktrees/*/` contain **full copies of the repo** from other sessions. Repo-wide `grep`/`find` will return duplicate (and sometimes divergent) hits — exclude that path when searching.
+
+The root policy pages and the `content/legal/*.md` drafts are **parallel copies**, not generated from each other. Editing one does not update the other; both still contain `[BRACKETS]` placeholders.
+
+## Editing gotcha: the HTML is minified
+
+The root pages are single-file and machine-dense — all CSS sits on one line and the JS on a handful of very long lines. Line counts are meaningless here; anchor edits on distinctive substrings, and expect a single "line" to be thousands of characters. `store/` and `api/lead.js` are the only readably-formatted sources.
 
 ## Running & deploying
 
-No build/lint/test. To preview locally: `npx serve .` (or open the `.html` files directly — the funnel works without a backend; `/api/lead` just no-ops locally).
+No build/lint/test commands exist. Preview locally with `npx serve .` (or open the `.html` files directly — the funnel works without a backend; `/api/lead` just no-ops locally, and the quiz swallows the fetch error).
 
 Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless function; `vercel.json` gives clean URLs. Server-side secrets (Klaviyo key, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
 
@@ -40,31 +50,42 @@ Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless func
 
 ## The config-driven pattern (important)
 
-`quiz.html` is driven by a single **`CONFIG`** object near the bottom of its `<script>`. Everything — questions, scoring weights, products, prices, theme, brand — reads from it. To change the quiz or add a product line you edit `CONFIG` only; the rest of the file is generic engine.
+`quiz.html` is driven by a single **`CONFIG`** object at the top of its `<script>`. Brand/currency, Pixel ID, lead endpoint, Shopify domain, the product, the concern block, and the questions all read from it; everything below it is a generic engine (`start` → `renderQuestion` → `choose` → `openLead` → `submitLead` → `renderResult`). To change the quiz you edit `CONFIG` only.
 
-- Answers add `w:{productKey: weight}` scores; `computeRec()` ranks products and picks a primary + add-ons.
-- The storefront pages (`index.html`, `product.html`) use a smaller **`SHOP`** object instead.
+Current shape — **single product, no scoring**. `CONFIG.product` is one product and `CONFIG.concern` is one concern; answers are plain `{l:"label"}` options with no weights, and there is no ranking step. The "personalised match" screen is copy that reflects `CONFIG.concern.goalTag`, not a computed recommendation. Answer labels are still collected and sent with the lead, so they are useful for segmentation in the ESP. If a second product line is ever added, the scoring layer has to be written — it isn't there to extend.
+
+The storefront pages (`index.html`, `product.html`) use a much smaller inline **`SHOP`** object (`{domain, variants}`) plus a `shopLink()` helper instead of `CONFIG`.
+
+The homepage is a **category hub**: a grid of product-line cards, one live and the rest marked "Coming soon". The coming-soon cards call `notifyMe(category)`, which stores the category, fires a Pixel `Lead` event and redirects to `quiz?interest=<category>` — `interest` is in the quiz's attribution key list so it reaches the ESP with the lead.
 
 ## Shopify checkout wiring
 
-"Add to cart" does not process payment here. When `CONFIG.shop.domain` (quiz) / `SHOP.domain` (store) and a product's `variantId` are set, the buy handlers redirect to a **Shopify cart permalink** `https://{domain}/cart/{variantId}:1` — real checkout happens on Shopify. Until those are filled, buttons show a "connect Shopify" prompt.
+"Add to cart" does not process payment here. When `CONFIG.shop.domain` + `CONFIG.product.variantId` (quiz) or `SHOP.domain` + `SHOP.variants[key]` (store) are set, the buy handlers redirect to a **Shopify cart permalink** `https://{domain}/cart/{variantId}:1` — real checkout happens on Shopify. Until those are filled, buttons `alert()` a "connect Shopify" prompt.
 
 ## Lead capture flow
 
-Quiz → `POST /api/lead` with `{email, name, track, answers, attr, consent}`. `api/lead.js` validates (email + consent required), then forwards to **Klaviyo** if `KLAVIYO_API_KEY` is set, else to `LEAD_WEBHOOK_URL`, else accepts and returns ok (so the funnel works before an ESP is connected). Marketing attribution (`utm_*`, `fbclid`, `ref`) is captured client-side into `localStorage` and sent with the lead. Meta Pixel loads only if `CONFIG.pixelId` is set.
+Quiz → `POST /api/lead` with `{email, name, track, answers, attr, consent}` (`track` is hardcoded `"hair"`). `api/lead.js` validates (valid email + `consent === true`, else 400), then forwards to **Klaviyo** (subscription bulk-create job, API revision pinned to `2024-10-15`) if `KLAVIYO_API_KEY` is set, else to `LEAD_WEBHOOK_URL`, else accepts and returns ok — so the funnel works before an ESP is connected.
+
+Two deliberate fail-open behaviours worth knowing before debugging "missing leads": the handler returns **200 even when the downstream forward throws** (it only `console.error`s), and the client fires the `fetch` without awaiting or checking the response. A lead can therefore appear to succeed and never reach the ESP; the Vercel function logs are the only signal. The lead is also mirrored into `localStorage` (`ojasLead`).
+
+Marketing attribution (`utm_*`, `fbclid`, `ref`, `interest`) is captured client-side into `localStorage` (`ojasAttr`, merged across visits) and sent with the lead. Meta Pixel loads only if `CONFIG.pixelId` is set; `track()` is a no-op otherwise.
 
 ## Placeholders convention
 
-Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: ""`, `domain: ""`) is a **deliberate fill-later dependency**, not a bug. The full list of what to fill and where is in `SETUP.md` (product facts, prices, Shopify variant IDs, Pixel ID, Klaviyo keys, domain, GST/entity/grievance-officer details).
+Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: ""`, `domain: ""`) is a **deliberate fill-later dependency**, not a bug. The full list of what to fill is in `SETUP.md` (product facts, prices, Shopify variant IDs, Pixel ID, Klaviyo keys, domain, GST/entity/grievance-officer details).
 
-**Prices live in more than one place** — `quiz.html` CONFIG.products, the store pages' displayed prices, and eventually Shopify. Keep them in sync when they change.
+**Prices live in more than one place** — `quiz.html` `CONFIG.product.price`, the store pages' displayed prices, and eventually Shopify. Keep them in sync when they change.
+
+**`README.md`, `SETUP.md` and the header comment in `api/lead.js` are stale**: they describe `index.html` as the quiz funnel holding `CONFIG`, and a multi-`tracks` structure. That was the pre-restructure layout — the quiz and `CONFIG` now live in `quiz.html` and there are no `tracks`. Trust the code over those three files, and fix them opportunistically.
 
 ## The hard constraint: claims compliance
 
-This is legal, not stylistic — India's **Drugs & Magic Remedies (Objectionable Advertisements) Act**, AYUSH/cosmetics rules, and Meta's ad review all restrict health claims. It governs **all** copy: the pages, the quiz product `benefit` lines, ad creative, emails, and DMs.
+This is legal, not stylistic — India's **Drugs & Magic Remedies (Objectionable Advertisements) Act**, AYUSH/cosmetics rules, and Meta's ad review all restrict health claims. It governs **all** copy: the pages, the quiz product `benefit` line, ad creative, emails, and DMs.
 
 - **Never** write: regrows hair, stops hair fall / treats hair loss, reverses greying, treats dandruff or any condition, cures/treats obesity, "clinically proven" (without a study). Prescription-drug DTC advertising is prohibited outright.
 - **Keep to** support/appearance framing: nourishes/comforts the scalp, conditions dry hair, softness & shine, helps hair *look* fuller and healthier, helps reduce the *look* of breakage, clears buildup without stripping.
-- Lead capture **must** keep its explicit consent checkbox (DPDP Act 2023); health-adjacent data needs consent.
+- Lead capture **must** keep its explicit consent checkbox (DPDP Act 2023); health-adjacent data needs consent. The server enforces this too — don't relax the `consent !== true` check.
+- The result screen carries a "not a medicine / not intended to diagnose, treat, cure or prevent any disease" disclaimer. Keep it on any new result or product surface.
+- New product categories must stay cosmetic. Anything framed as restoration, treatment, or clinical care — the model most telehealth sites use — is not available to this brand in India.
 
 When in doubt, describe what a product *is* and how it makes hair *look/feel* — never what it cures.
