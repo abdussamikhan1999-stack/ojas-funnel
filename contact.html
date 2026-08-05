@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact — Ojas</title>
+<meta name="description" content="Reach the Ojas team about an order, a product question, or a data request. Grievance officer details as required under the DPDP Act.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,500;0,9..144,600;1,9..144,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#fbf6ee;--card:#fff;--ink:#241d16;--muted:#6f6459;--faint:#a2988b;--line:#eae0d1;--saffron:#d98a2b;--leaf:#2f6d4f;--ring:#2f6d4f;--sans:"Inter",system-ui,sans-serif;--serif:"Fraunces",Georgia,serif}
+@media (prefers-color-scheme:dark){:root{--bg:#14110c;--card:#1d1913;--ink:#f1ebe0;--muted:#b0a595;--faint:#7c7364;--line:#2c261d;--saffron:#e6a24f;--leaf:#5fb187;--ring:#5fb187}}
+*{box-sizing:border-box;margin:0;padding:0}html{scroll-behavior:smooth}body{background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.65;-webkit-font-smoothing:antialiased}
+.wrap{max-width:800px;margin:0 auto;padding:0 24px}a{color:inherit;text-decoration:none}button{font-family:inherit;cursor:pointer;border:0;background:none;color:inherit}
+.eyebrow{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--leaf);font-weight:700}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;font-size:15px;font-weight:600;padding:14px 26px;border-radius:12px;transition:transform .08s,filter .2s,border-color .2s}
+.btn:active{transform:translateY(1px)}.btn-p{background:var(--leaf);color:#fff}.btn-p:hover{filter:brightness(1.07)}
+:focus-visible{outline:2px solid var(--ring);outline-offset:3px}
+nav{position:sticky;top:0;z-index:40;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(12px);border-bottom:1px solid var(--line)}
+.nav-in{display:flex;align-items:center;justify-content:space-between;height:64px;max-width:1080px;margin:0 auto;padding:0 24px}
+.brand{font-family:var(--serif);font-size:25px;font-weight:600;display:flex;align-items:baseline;gap:.3em}.brand .dv{font-size:.6em;color:var(--saffron)}
+.nav-links{display:flex;gap:26px;align-items:center}.nav-links a{font-size:14px;color:var(--muted)}.nav-links a:hover{color:var(--ink)}@media(max-width:760px){.nav-links a:not(.navcta){display:none}}
+header.pg{padding:64px 0 24px}header.pg h1{font-family:var(--serif);font-weight:500;font-size:clamp(34px,5.6vw,52px);line-height:1.05;letter-spacing:-.02em;margin:14px 0 16px}
+header.pg p.lede{font-size:18px;color:var(--muted);max-width:600px}
+section{padding:26px 0}h2{font-family:var(--serif);font-weight:500;font-size:clamp(22px,3.2vw,28px);margin-bottom:14px;letter-spacing:-.01em}
+p{color:var(--muted);font-size:16px;margin-bottom:14px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px}@media(max-width:700px){.grid-2{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 24px}
+.card .ic{font-size:24px;margin-bottom:10px}.card h3{font-family:var(--serif);font-weight:500;font-size:19px;margin-bottom:6px}
+.card p{font-size:14.5px;margin-bottom:8px}.card .val{font-size:15px;color:var(--ink);font-weight:600;word-break:break-word}
+.legal{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:26px 24px;margin-top:16px}
+.legal dl{display:grid;grid-template-columns:170px 1fr;gap:10px 18px;font-size:14.5px}@media(max-width:600px){.legal dl{grid-template-columns:1fr;gap:2px 0}.legal dd{margin-bottom:12px}}
+.legal dt{color:var(--faint);font-size:12px;letter-spacing:.08em;text-transform:uppercase;font-weight:700;padding-top:2px}.legal dd{color:var(--ink)}
+.callout{background:var(--card);border:1px solid var(--line);border-left:3px solid var(--saffron);border-radius:10px;padding:16px 18px;font-size:14.5px;color:var(--muted);margin:18px 0}
+footer{border-top:1px solid var(--line);padding:40px 0 44px;margin-top:30px}
+.foot-links{display:flex;gap:18px;flex-wrap:wrap;margin-bottom:20px}.foot-links a{font-size:14px;color:var(--muted)}.foot-links a:hover{color:var(--ink)}
+.disc{font-size:12px;color:var(--faint);border-top:1px solid var(--line);padding-top:20px;line-height:1.7}.disc b{color:var(--muted)}
+</style>
+</head>
+<body>
+<nav><div class="nav-in"><a href="/" class="brand">Ojas<span class="dv">ओजस्</span></a><div class="nav-links"><a href="/#categories">Shop</a><a href="about">About</a><a href="faq">FAQ</a><a href="contact">Contact</a><a class="btn btn-p navcta" style="padding:10px 18px;font-size:14px" href="quiz">Take the quiz</a></div></div></nav>
+
+<header class="pg"><div class="wrap"><span class="eyebrow">Contact</span><h1>Talk to us.</h1><p class="lede">A real person reads these. Most questions are answered on the <a href="faq" style="color:var(--leaf);text-decoration:underline">FAQ page</a> — for anything else, here is how to reach us.</p></div></header>
+
+<section><div class="wrap"><div class="grid-2">
+<div class="card"><div class="ic">✉️</div><h3>General &amp; orders</h3><p>Order status, product questions, anything else.</p><div class="val">[CONTACT EMAIL]</div><p style="margin-top:8px;font-size:13.5px">We aim to reply within [RESPONSE TIME].</p></div>
+<div class="card"><div class="ic">📞</div><h3>Phone</h3><p>[SUPPORT HOURS], Monday to Saturday.</p><div class="val">[PHONE]</div></div>
+<div class="card"><div class="ic">📦</div><h3>Returns</h3><p>Unopened items within [RETURN WINDOW] days. Start with your order number.</p><div class="val">[CONTACT EMAIL]</div><p style="margin-top:8px;font-size:13.5px">See the <a href="refund" style="color:var(--leaf);text-decoration:underline">refund policy</a>.</p></div>
+<div class="card"><div class="ic">🔐</div><h3>Data &amp; privacy</h3><p>Access, correction or deletion of your personal data.</p><div class="val">[EMAIL]</div><p style="margin-top:8px;font-size:13.5px">Grievance Officer, per the DPDP Act 2023.</p></div>
+</div></div></section>
+
+<section><div class="wrap"><h2>Business details</h2><div class="callout">Required for Indian e-commerce and for Meta/Instagram ad review. Fill every bracket before running ads or taking orders.</div>
+<div class="legal"><dl>
+<dt>Legal entity</dt><dd>[LEGAL ENTITY NAME]</dd>
+<dt>Registered address</dt><dd>[REGISTERED ADDRESS]</dd>
+<dt>GSTIN</dt><dd>[GST NUMBER]</dd>
+<dt>Grievance officer</dt><dd>[NAME] — [EMAIL]</dd>
+<dt>Customer care</dt><dd>[CONTACT EMAIL] · [PHONE]</dd>
+</dl></div></div></section>
+
+<section><div class="wrap"><h2>A note on health questions</h2><p>We get asked whether Ojas will fix hair loss, dandruff or greying. We can't answer that, because our oil isn't a medicine and doesn't treat conditions — the <a href="faq#claims" style="color:var(--leaf);text-decoration:underline">FAQ says so plainly</a>. If something about your hair or scalp worries you, please speak to a doctor or dermatologist. We would rather lose the sale than give you medical advice we aren't qualified to give.</p></div></section>
+
+<footer><div class="wrap"><div class="foot-links"><a href="/">Home</a><a href="/#categories">Shop</a><a href="quiz">Quiz</a><a href="about">About</a><a href="faq">FAQ</a><a href="contact">Contact</a><a href="privacy">Privacy</a><a href="terms">Terms</a><a href="refund">Refund</a><a href="shipping">Shipping</a></div><p class="disc"><b>A note on claims.</b> Ojas products are cosmetic/Ayurvedic wellness products that support a hair- and body-care routine. They are not medicines and are <b>not intended to diagnose, treat, cure or prevent any disease</b>. Sold by [LEGAL ENTITY NAME], [REGISTERED ADDRESS]. GSTIN [GST NUMBER]. © 2026 Ojas.</p></div></footer>
+</body>
+</html>
