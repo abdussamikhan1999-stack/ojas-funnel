@@ -11,11 +11,13 @@ The business model (see `docs/FUNNEL-SYSTEM.md`): Meta/Instagram traffic → qui
 ## Layout
 
 ```
-index.html      Storefront HOMEPAGE (served at /)
+index.html      Storefront HOMEPAGE / category hub (served at /)
 quiz.html       The quiz funnel (served at /quiz) — the lead-gen engine, holds CONFIG
 product.html    Product page (served at /product)
+about|faq|contact.html               Marketing pages (served at /about, …)
 privacy|terms|refund|shipping.html   Rendered policy pages (served at /privacy, …)
 api/lead.js     Vercel serverless function: receives quiz leads, forwards to ESP
+preview.py      Local dev server that reproduces vercel.json's clean URLs
 content/legal/  Markdown source/drafts for the four policy pages
 content/copy/   Storefront copy
 content/email/  Klaviyo flow copy
@@ -38,7 +40,11 @@ The root pages are single-file and machine-dense — all CSS sits on one line an
 
 ## Running & deploying
 
-No build/lint/test commands exist. Preview locally with `npx serve .` (or open the `.html` files directly — the funnel works without a backend; `/api/lead` just no-ops locally, and the quiz swallows the fetch error).
+No build/lint/test commands exist. Preview with **`python3 preview.py`** (port 8777).
+
+Use that rather than `npx serve .` or `python -m http.server`: the pages link to each other without file extensions (`href="about"`), which only resolves because `vercel.json` sets `cleanUrls`. A plain static server 404s on every nav link, so the site looks broken locally while being fine in production. `preview.py` reproduces both `cleanUrls` and `trailingSlash:false`.
+
+Opening the `.html` files directly over `file://` has the same problem, and worse — the funnel itself still works (`/api/lead` no-ops locally and the quiz swallows the fetch error), but you cannot navigate between pages.
 
 Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless function; `vercel.json` gives clean URLs. Server-side secrets (Klaviyo key, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
 
@@ -56,11 +62,18 @@ Current shape — **single product, no scoring**. `CONFIG.product` is one produc
 
 The storefront pages (`index.html`, `product.html`) use a much smaller inline **`SHOP`** object (`{domain, variants}`) plus a `shopLink()` helper instead of `CONFIG`.
 
-The homepage is a **category hub**: a grid of product-line cards, one live and the rest marked "Coming soon". The coming-soon cards call `notifyMe(category)`, which stores the category, fires a Pixel `Lead` event and redirects to `quiz?interest=<category>` — `interest` is in the quiz's attribution key list so it reaches the ESP with the lead.
+The homepage is a **category hub**: a grid of product-line cards, one live (Hair & Scalp) and five marked "Coming soon". The coming-soon cards call `notifyMe(category)`, which opens an inline waitlist modal — email + DPDP consent — and POSTs to `/api/lead` with `track: "waitlist-<category>"` and `attr.interest` set. Waitlist signups therefore land in the same ESP list as quiz leads, segmented by interest.
 
-## Shopify checkout wiring
+Don't revert this to a redirect into the quiz: the quiz is hair-specific throughout, so sending a skin-care visitor there is a mismatch that leaks signups. (`interest` is also still read from the query string by the quiz, harmless but no longer the main path.)
 
-"Add to cart" does not process payment here. When `CONFIG.shop.domain` + `CONFIG.product.variantId` (quiz) or `SHOP.domain` + `SHOP.variants[key]` (store) are set, the buy handlers redirect to a **Shopify cart permalink** `https://{domain}/cart/{variantId}:1` — real checkout happens on Shopify. Until those are filled, buttons `alert()` a "connect Shopify" prompt.
+## Checkout wiring
+
+"Add to cart" does not process payment here — it redirects somewhere that does. The handlers (`shopLink()` on the store pages, `addToCart()` in the quiz) try two routes in order:
+
+1. **A payment link** — `SHOP.payLinks[key]` / `CONFIG.product.payLink`. Intended for a **Razorpay Payment Link or Payment Page**, which has no monthly platform fee, only a per-transaction cut. This is the preferred route and the reason the site does not require Shopify.
+2. **A Shopify cart permalink** — `https://{domain}/cart/{variantId}:1`, used only if `domain` + `variantId` are set and no payment link is.
+
+With neither set, the buttons `alert()` a "checkout not connected" prompt. The owner is cost-sensitive, so prefer the payment-link path when extending this; don't reintroduce a hard Shopify dependency without asking.
 
 ## Lead capture flow
 
@@ -76,7 +89,11 @@ Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: "
 
 **Prices live in more than one place** — `quiz.html` `CONFIG.product.price`, the store pages' displayed prices, and eventually Shopify. Keep them in sync when they change.
 
-**`README.md`, `SETUP.md` and the header comment in `api/lead.js` are stale**: they describe `index.html` as the quiz funnel holding `CONFIG`, and a multi-`tracks` structure. That was the pre-restructure layout — the quiz and `CONFIG` now live in `quiz.html` and there are no `tracks`. Trust the code over those three files, and fix them opportunistically.
+`README.md` and `SETUP.md` now match this layout (quiz.html holds CONFIG, no `tracks`); `api/lead.js`'s header comment does too. If you spot any of the three drift again after further edits, fix it opportunistically.
+
+## SEO baseline (added — keep in sync when adding pages)
+
+Every page carries a `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:title`, `og:description`), a `twitter:card`, and an inline-SVG data-URI favicon (a teardrop on the brand-green `#2f6d4f`, no external asset). `robots.txt` allows all crawlers. There is **no `sitemap.xml` yet** — it needs absolute URLs, and no domain is purchased yet (see `SETUP.md`); add one once the domain is live. There is **no `og:image`** for the same reason product photography doesn't exist yet — add one to every page once real photos exist.
 
 ## The hard constraint: claims compliance
 
