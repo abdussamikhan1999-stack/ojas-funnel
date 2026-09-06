@@ -1,5 +1,5 @@
 // Vercel serverless function — receives quiz leads and forwards them to your ESP.
-// Set as CONFIG.leadEndpoint = "/api/lead" in index.html.
+// Set as CONFIG.leadEndpoint = "/api/lead" in quiz.html.
 // Secrets come from environment variables (see .env.example) — none are committed.
 //
 // Behaviour:
