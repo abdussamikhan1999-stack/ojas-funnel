@@ -27,16 +27,15 @@ vercel.json     cleanUrls + trailingSlash:false (so /quiz -> quiz.html)
 .env.example    Names of the server-side secrets (values live in Vercel only)
 ```
 
-Two things in the tree are **not** live code:
+One thing in the tree is **not** live code:
 
-- `store/` is a **stale earlier copy** of the homepage/product page (pre-restructure, un-minified). The root `index.html` / `product.html` are canonical; ignore or delete `store/`.
 - `.claude/worktrees/*/` contain **full copies of the repo** from other sessions. Repo-wide `grep`/`find` will return duplicate (and sometimes divergent) hits — exclude that path when searching.
 
 The root policy pages and the `content/legal/*.md` drafts are **parallel copies**, not generated from each other. Editing one does not update the other; both still contain `[BRACKETS]` placeholders.
 
 ## Editing gotcha: the HTML is minified
 
-The root pages are single-file and machine-dense — all CSS sits on one line and the JS on a handful of very long lines. Line counts are meaningless here; anchor edits on distinctive substrings, and expect a single "line" to be thousands of characters. `store/` and `api/lead.js` are the only readably-formatted sources.
+The root pages are single-file and machine-dense — all CSS sits on one line and the JS on a handful of very long lines. Line counts are meaningless here; anchor edits on distinctive substrings, and expect a single "line" to be thousands of characters. `api/lead.js` is the only readably-formatted source.
 
 ## Running & deploying
 
