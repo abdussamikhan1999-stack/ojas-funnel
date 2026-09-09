@@ -63,7 +63,7 @@ Current shape — **single product, no scoring**. `CONFIG.product` is one produc
 
 The storefront pages (`index.html`, `product.html`) use a much smaller inline **`SHOP`** object (`{domain, variants}`) plus a `shopLink()` helper instead of `CONFIG`.
 
-The homepage is a **category hub**: a grid of product-line cards, one live (Hair & Scalp) and five marked "Coming soon". The coming-soon cards call `notifyMe(category)`, which opens an inline waitlist modal — email + DPDP consent — and POSTs to `/api/lead` with `track: "waitlist-<category>"` and `attr.interest` set. Waitlist signups therefore land in the same ESP list as quiz leads, segmented by interest.
+The homepage is a **category hub** styled as an apothecary label (ink/amber palette, real bottle + ingredient photography — see credits in each page's footer): one live category (Hair & Scalp) plus a "More categories, in formulation" section for the rest (beard, body, skin, rituals, gifting). Those call `notifyMe(category)`, which opens an inline waitlist modal — email + DPDP consent — and POSTs to `/api/lead` with `track: "waitlist-<category>"` and `attr.interest` set. Waitlist signups therefore land in the same ESP list as quiz leads, segmented by interest.
 
 Don't revert this to a redirect into the quiz: the quiz is hair-specific throughout, so sending a skin-care visitor there is a mismatch that leaks signups. (`interest` is also still read from the query string by the quiz, harmless but no longer the main path.)
 
@@ -94,7 +94,7 @@ Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: "
 
 ## SEO baseline (added — keep in sync when adding pages)
 
-Every page carries a `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:title`, `og:description`), a `twitter:card`, and an inline-SVG data-URI favicon (a teardrop on the brand-green `#2f6d4f`, no external asset). `robots.txt` allows all crawlers. There is **no `sitemap.xml` yet** — it needs absolute URLs, and no domain is purchased yet (see `SETUP.md`); add one once the domain is live. There is **no `og:image`** for the same reason product photography doesn't exist yet — add one to every page once real photos exist.
+Every page carries a `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:title`, `og:description`), a `twitter:card`, and an inline-SVG data-URI favicon (a teardrop on ink `#211A13` / amber `#A85F10`, no external asset — matches the apothecary-label redesign). `robots.txt` allows all crawlers. There is **no `sitemap.xml` yet** — it needs absolute URLs, and no domain is purchased yet (see `SETUP.md`); add one once the domain is live. There is **no `og:image`** yet either — real bottle and ingredient photography now exists (credited in each page's footer), so this is just not done, not blocked; add one to every page's `<head>`.
 
 ## The hard constraint: claims compliance
 
