@@ -1,19 +1,32 @@
-https://github.com/abdussamikhan1999-stack/ojas-funnel/new/main?filename=.github/workflows/claude.yml&
-  lue=name%3A%20Claude%20Code%0Aon%3A%0A%20%20issue_comment%3A%0A%20%20%20%20types%3A%20%5Bcreated%5D%0A%2
-  0%20pull_request_review_comment%3A%0A%20%20%20%20types%3A%20%5Bcreated%5D%0A%20%20issues%3A%0A%20%20%20%
-  20types%3A%20%5Bopened%2C%20assigned%5D%0A%20%20pull_request_review%3A%0A%20%20%20%20types%3A%20%5Bsubmi
-  tted%5D%0A%0Ajobs%3A%0A%20%20claude%3A%0A%20%20%20%20if%3A%20%7C%0A%20%20%20%20%20%20%28github.event_nam
-  e%20%3D%3D%20%27issue_comment%27%20%26%26%20contains%28github.event.comment.body%2C%20%27%40claude%27%29
-  %29%20%7C%7C%0A%20%20%20%20%20%20%28github.event_name%20%3D%3D%20%27pull_request_review_comment%27%20%26
-  %26%20contains%28github.event.comment.body%2C%20%27%40claude%27%29%29%20%7C%7C%0A%20%20%20%20%20%20%28gi
-  thub.event_name%20%3D%3D%20%27pull_request_review%27%20%26%26%20contains%28github.event.review.body%2C%2
-  0%27%40claude%27%29%29%20%7C%7C%0A%20%20%20%20%20%20%28github.event_name%20%3D%3D%20%27issues%27%20%26%2
-  6%20%28contains%28github.event.issue.body%2C%20%27%40claude%27%29%20%7C%7C%20contains%28github.event.iss
-  ue.title%2C%20%27%40claude%27%29%29%29%0A%20%20%20%20runs-on%3A%20ubuntu-latest%0A%20%20%20%20permission
-  s%3A%0A%20%20%20%20%20%20contents%3A%20write%0A%20%20%20%20%20%20pull-requests%3A%20write%0A%20%20%20%20
-  %20%20issues%3A%20write%0A%20%20%20%20%20%20id-token%3A%20write%0A%20%20%20%20steps%3A%0A%20%20%20%20%20
-  %20-%20name%3A%20Checkout%20repository%0A%20%20%20%20%20%20%20%20uses%3A%20actions/checkout%40v4%0A%20%2
-  0%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%20fetch-depth%3A%201%0A%0A%20%20%20%20%20%20-%2
-  0name%3A%20Run%20Claude%20Code%0A%20%20%20%20%20%20%20%20id%3A%20claude%0A%20%20%20%20%20%20%20%20uses%3
-  A%20anthropics/claude-code-action%40v1%0A%20%20%20%20%20%20%20%20with%3A%0A%20%20%20%20%20%20%20%20%20%2
-  0anthropic_api_key%3A%20%24%7B%7B%20secrets.ANTHROPIC_API_KEY%20%7D%7D%0A
+name: Claude Code
+  on:
+    issue_comment:
+      types: [created]
+    pull_request_review_comment:
+      types: [created]
+    issues:
+      types: [opened, assigned]
+    pull_request_review:
+      types: [submitted]
+
+  jobs:
+    claude:
+      if: contains(github.event.comment.body, '@claude') || contains(github.event.review.body, '@claude')
+  || contains(github.event.issue.body, '@claude') || contains(github.event.issue.title, '@claude')
+      runs-on: ubuntu-latest
+      permissions:
+        contents: write
+        pull-requests: write
+        issues: write
+        id-token: write
+      steps:
+        - name: Checkout repository
+          uses: actions/checkout@v4
+          with:
+            fetch-depth: 1
+
+        - name: Run Claude Code
+          id: claude
+          uses: anthropics/claude-code-action@v1
+          with:
+            anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
