@@ -32,10 +32,16 @@ once its economics are actually known; it isn't the primary offer for now.
   `content/copy/store-copy.md`). Delivered immediately after the quiz, so
   the "2-minute quiz → personalised result" flow that's already built
   becomes the actual product delivery mechanism, not just a lead-gen step.
-- **Launch offer:** ₹249 for the first cohort (founding price, anchored
-  against the ₹399 regular price), time-boxed — pick a concrete window
-  (e.g. first 14 days or first 200 buyers) before running ads.
-  **NEEDS DECISION:** exact deadline/cap.
+- **Launch offer:** ₹249 founding price (anchored against the ₹399 regular
+  price), ends at **whichever comes first: 200 buyers, or 14 days from
+  launch**. A fixed calendar date isn't set — ads aren't live yet
+  (`CONFIG.pixelId`/Klaviyo/`payLink` all still empty), so a hardcoded date
+  would go stale before the funnel even runs. `CONFIG.launchDate` in
+  `quiz.html` stays empty until launch; the 14-day window is 14 days from
+  whatever gets filled in there. The 200-buyer cap has no live counter
+  (this repo has no order-tracking backend) — enforce it manually by
+  swapping `CONFIG.product.price` to 399 (and dropping the strikethrough)
+  once either condition is hit.
 - **Channel:** Meta/Instagram ads → quiz (now doubles as both lead capture
   *and* the personalization step for the digital product) → immediate
   digital delivery + Klaviyo nurture. Still not live — `CONFIG.pixelId`

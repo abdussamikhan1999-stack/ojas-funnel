@@ -36,9 +36,12 @@ Claims stay inside this repo's compliance policy: support/appearance framing onl
   the protocol for a few weeks, replace this with real feedback.]
 
 - **Offer block:** ₹249 founding-cohort price (regular ₹399) — delivered
-  by email immediately after the quiz. Founding price is time-boxed;
-  **NEEDS DECISION** on the exact deadline/cap (see `PRODUCT.md`) before
-  this can state one on the live page.
+  by email immediately after the quiz. "Founding price — limited to the
+  first 200" as the stated line; don't add a live countdown timer or a
+  "X spots left" counter since nothing in this repo tracks buyer count —
+  a static cap claim is honest, a fake live counter isn't. Once
+  `CONFIG.launchDate` is set (see `PRODUCT.md`), this can also state "or
+  ends [date], whichever comes first."
 
 - **Objection handling:**
   - *"Is this actually different from just Googling a routine?"* — It's

@@ -28,8 +28,8 @@ support/appearance framing only, never regrowth/cure language.
 - **Primary text:** The mistake: using the same hair routine no matter
   what your scalp actually needs. Oily roots and dry lengths don't want
   the same thing. Take the quiz, get matched to your concern, and get a
-  protocol built for it — not a generic one. ₹249 founding price, ends
-  soon.
+  protocol built for it — not a generic one. ₹249 founding price, limited
+  to the first 200.
 - **Headline:** Stop guessing with your hair
 - **Description:** Get matched in 2 minutes
 - **CTA button:** Learn More
@@ -44,7 +44,7 @@ support/appearance framing only, never regrowth/cure language.
   concern, and get a personalized routine: what nourishes your scalp,
   conditions your lengths, and helps hair look fuller and healthier over
   time. No regrowth promises — just an honest, ingredient-literate ritual.
-- **Headline:** ₹249 founding price — ends soon
+- **Headline:** ₹249 founding price — first 200 only
 - **Description:** Personalized hair protocol
 - **CTA button:** Shop Now
 - **Creative:** Product/result screen mockup with the ₹249 price and
