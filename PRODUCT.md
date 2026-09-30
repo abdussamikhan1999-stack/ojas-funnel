@@ -49,10 +49,24 @@ At ₹249 launch price, ~95% margin (payment fee only), 1 order/customer:
 At ₹150 CAC the ratio drops to 1.58:1 — still profitable but thin. Use ₹79
 as the number to hold `ads-meta/` spend against once campaigns are live.
 
-## What still needs to be written (not this file's job — see `docs/`)
+## Status (updated 2026-09-30)
 
-The protocol content itself doesn't exist yet: four concern-specific
-guides (thinning / dry-brittle / oily-buildup / breakage), each with an
-ingredient explainer, a 4-week ritual calendar, do's/don'ts, and a
-troubleshooting section. That's real content work, tracked separately from
-this pricing/positioning file.
+- ✅ `quiz.html`'s `CONFIG.product` now models this digital protocol (₹249 /
+  ₹399, id `ojas-protocol`), not the physical oil.
+- ✅ Quiz-to-guide matching is implemented: `matchProtocol()` in
+  `quiz.html` maps the three existing quiz answers to one of the four
+  protocol slugs; the result screen shows the matched protocol's name and
+  the lead payload carries `attr.protocol`. See
+  `content/protocol/README.md` → "How matching works".
+- ✅ The four protocol guides themselves exist in `content/protocol/`
+  (`thinning.md`, `dry-brittle.md`, `oily-buildup.md`, `breakage.md`).
+- ⬜ **Actual delivery is still manual.** Nothing sends the matched
+  guide's content to the buyer yet — no email automation renders it, and
+  it isn't shown on the result screen (would give away the paid content
+  for free). This needs either a Klaviyo flow keyed on `attr.protocol`
+  (once Klaviyo is connected) or a paywalled reveal after checkout.
+- ⬜ Founding-offer deadline/cap — still not chosen (see Launch offer above).
+- ⬜ Refund terms — blocks the landing page's guarantee claim (see
+  `content/copy/protocol-landing-page.md`).
+- ⬜ `CONFIG.pixelId`, Klaviyo keys, and a real Razorpay `payLink` — all
+  still empty; pre-existing gaps per `SETUP.md`, unrelated to this pivot.
