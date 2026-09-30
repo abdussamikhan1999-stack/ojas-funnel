@@ -71,8 +71,18 @@ as the number to hold `ads-meta/` spend against once campaigns are live.
   it isn't shown on the result screen (would give away the paid content
   for free). This needs either a Klaviyo flow keyed on `attr.protocol`
   (once Klaviyo is connected) or a paywalled reveal after checkout.
-- ⬜ Founding-offer deadline/cap — still not chosen (see Launch offer above).
-- ⬜ Refund terms — blocks the landing page's guarantee claim (see
-  `content/copy/protocol-landing-page.md`).
+- ✅ Founding-offer deadline/cap decided: first 200 buyers or 14 days from
+  launch, whichever comes first (see Launch offer above).
+- ✅ Refund terms decided: 7-day satisfaction guarantee, full refund, no
+  reason required — `refund.html` and `content/legal/refund-and-returns.md`
+  rewritten for the digital product (the old versions were physical-return
+  policies and didn't apply). Legal-entity fields (`[LEGAL ENTITY NAME]`,
+  `[SUPPORT EMAIL]`, `[PHONE]`, `[DATE]`) are still real placeholders —
+  genuine business facts only you can supply, not filled in here.
+- ⬜ **Actual delivery is still manual.** Nothing sends the matched
+  guide's content to the buyer yet — no email automation renders it, and
+  it isn't shown on the result screen (would give away the paid content
+  for free). This needs either a Klaviyo flow keyed on `attr.protocol`
+  (once Klaviyo is connected) or a paywalled reveal after checkout.
 - ⬜ `CONFIG.pixelId`, Klaviyo keys, and a real Razorpay `payLink` — all
   still empty; pre-existing gaps per `SETUP.md`, unrelated to this pivot.

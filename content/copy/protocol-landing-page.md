@@ -59,12 +59,11 @@ Claims stay inside this repo's compliance policy: support/appearance framing onl
     Founding price is less than the ₹399 regular price for exactly this
     reason — it's the low-risk way in.
 
-- **Guarantee:** *Recommended, not yet finalized:* a 7-day satisfaction
-  guarantee — since delivery cost is ~₹0, there's no real downside to
-  offering one, and it directly answers the "steep for a PDF" objection
-  above. **NEEDS DECISION** — this repo's refund policy page
-  (`refund.html` / `content/legal/`) still has unfilled `[BRACKETS]`, so
-  don't publish a guarantee here until that page states matching terms.
+- **Guarantee:** 7-day satisfaction guarantee, full refund, no reason
+  required — matches `refund.html` / `content/legal/refund-and-returns.md`.
+  Directly answers the "steep for a PDF" objection above. On-page copy:
+  "Try it for 7 days. If it's not right for you, email us for a full
+  refund — no questions asked."
 
 - **Final CTA:** Get matched to your protocol — ₹249 founding price →
   [Take the 2-minute quiz] (single button, no competing links or nav
