@@ -1,6 +1,6 @@
 # Ojas — Lead-to-Sale Funnel
 
-A lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand. Static, single-file pages + one serverless lead endpoint. Deploys to Vercel with no build step.
+A lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand. Static, single-file pages + two serverless endpoints. Deploys to Vercel with no build step.
 
 ## What's here
 
@@ -12,15 +12,23 @@ quiz.html         The quiz funnel — the lead-gen engine. Everything is driven
                   the concern/questions. Editing CONFIG is the only thing you
                   do to change the quiz.
 product.html      Product page.
+deliver.html      Post-purchase delivery page (served at /deliver) — shows the
+                  buyer their matched protocol once api/deliver.js has
+                  verified a real Razorpay payment.
 about|faq|contact.html               Marketing pages.
 privacy|terms|refund|shipping.html   Rendered policy pages.
 api/lead.js       Optional Vercel serverless function. Receives quiz leads and
                   forwards them to your ESP (Klaviyo etc.). Reads secrets from
                   env vars — none are committed.
+api/deliver.js    Vercel serverless function. Verifies a Razorpay payment
+                  signature, then releases the matched protocol's content
+                  from content/protocol/*.md.
 preview.py        Local dev server that reproduces vercel.json's clean URLs.
 vercel.json       Static hosting + clean URLs.
-.env.example      The env vars api/lead.js expects. Copy to Vercel's env settings.
+.env.example      The env vars api/lead.js and api/deliver.js expect. Copy to
+                  Vercel's env settings.
 docs/             The operating manual for the funnel system.
+content/protocol/ The four paid protocol guides — the actual product.
 ```
 
 ## Configure
@@ -47,9 +55,10 @@ Don't use `npx serve .` or `python3 -m http.server` — pages link to each other
 
 1. Push to GitHub (this repo).
 2. Import into Vercel → framework preset **Other** → deploy. No build command needed.
-3. Add the env vars from `.env.example` in Vercel's project settings (only needed for `api/lead.js`).
-4. Point your link-in-bio at the deployed URL.
+3. Add the env vars from `.env.example` in Vercel's project settings (`api/lead.js` and `api/deliver.js` need them).
+4. In Razorpay, set your Payment Link's Redirect URL to `https://<your-domain>/deliver` so buyers land on their protocol automatically (see `SETUP.md`).
+5. Point your link-in-bio at the deployed URL.
 
 ## Secrets
 
-Never commit API keys. `api/lead.js` reads them from environment variables only. `.env` is gitignored; `.env.example` documents the names, not the values.
+Never commit API keys. `api/lead.js` and `api/deliver.js` read them from environment variables only. `.env` is gitignored; `.env.example` documents the names, not the values.

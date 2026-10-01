@@ -8,6 +8,8 @@ Everything that's **built** vs. the **dependencies to fill in later** (API keys,
 - `about.html`, `faq.html`, `contact.html` — marketing pages.
 - `privacy|terms|refund|shipping.html` — rendered policy pages (drafts also live in `content/legal/*`, edited separately).
 - `api/lead.js` — serverless lead capture → Klaviyo/webhook.
+- `api/deliver.js` + `deliver.html` — delivers the paid digital protocol after a verified Razorpay payment (see "Payments & commerce" below for the one dashboard setting this needs).
+- `content/protocol/*.md` — the four protocol guides themselves (the actual paid deliverable), matched by `quiz.html`'s `matchProtocol()`.
 - `content/copy/store-copy.md` — homepage, product-page, about copy (compliant).
 - `content/email/klaviyo-flows.md` — welcome, quiz-result, abandoned-cart, post-purchase, winback email copy.
 - `docs/FUNNEL-SYSTEM.md` — the operating manual.
@@ -17,6 +19,8 @@ Everything that's **built** vs. the **dependencies to fill in later** (API keys,
 
 ### Payments & commerce (you own: Razorpay / Shopify / Stripe)
 - [ ] Razorpay Payment Link (or Payment Page) created for the product → paste into `SHOP.payLinks[key]` (index.html/product.html) and `CONFIG.product.payLink` (quiz.html). This is the preferred route — no monthly platform fee.
+- [ ] **Set the Payment Link's "Redirect URL" (Razorpay dashboard → that link → Settings) to `https://<your-domain>/deliver`.** This is what makes delivery automatic — without it, a buyer pays and lands on Razorpay's own generic thank-you page instead of their protocol. Razorpay appends its own signed payment params to whatever URL is set here; `deliver.html` reads them.
+- [ ] Set `RAZORPAY_KEY_SECRET` in **Vercel env vars** (Razorpay dashboard → Settings → API Keys → "Key Secret", not the public Key ID). Required for `api/deliver.js` to verify a payment is real before releasing the protocol — without it, `/deliver` shows a "finalising delivery" holding message instead of leaking content.
 - [ ] (Optional, only if not using a payment link) Shopify store created, products added, Razorpay connected as the India gateway → paste `shop.domain` + each product `variantId`.
 
 ### Tracking (Meta)

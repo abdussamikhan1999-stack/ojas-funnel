@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## What this is
 
-**Ojas** — a lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand (India / INR). Static single-file HTML pages plus one Vercel serverless function. **No build step, no package.json, no framework, no tests.** Everything is vanilla HTML/CSS/JS designed to deploy to Vercel as-is.
+**Ojas** — a lead-to-sale funnel + storefront for a personalised Ayurvedic hair-oil brand (India / INR). Static single-file HTML pages plus two Vercel serverless functions. **No build step, no package.json, no framework, no tests.** Everything is vanilla HTML/CSS/JS designed to deploy to Vercel as-is.
 
 The business model (see `docs/FUNNEL-SYSTEM.md`): Meta/Instagram traffic → quiz captures a **lead** → email nurture → **sale** via Shopify. This repo is the funnel + storefront half; commerce (checkout, payments, subscriptions) is delegated to Shopify + Razorpay.
 
@@ -14,13 +14,16 @@ The business model (see `docs/FUNNEL-SYSTEM.md`): Meta/Instagram traffic → qui
 index.html      Storefront HOMEPAGE / category hub (served at /)
 quiz.html       The quiz funnel (served at /quiz) — the lead-gen engine, holds CONFIG
 product.html    Product page (served at /product)
+deliver.html    Post-purchase delivery page (served at /deliver) — see "Delivery" below
 about|faq|contact.html               Marketing pages (served at /about, …)
 privacy|terms|refund|shipping.html   Rendered policy pages (served at /privacy, …)
 api/lead.js     Vercel serverless function: receives quiz leads, forwards to ESP
+api/deliver.js  Vercel serverless function: verifies a Razorpay payment, releases the paid protocol
 preview.py      Local dev server that reproduces vercel.json's clean URLs
 content/legal/  Markdown source/drafts for the four policy pages
 content/copy/   Storefront copy
 content/email/  Klaviyo flow copy
+content/protocol/  The four paid protocol guides (the actual deliverable — see PRODUCT.md)
 docs/FUNNEL-SYSTEM.md   The product-agnostic operating manual
 SETUP.md        "Built vs. fill-later" dependency checklist
 vercel.json     cleanUrls + trailingSlash:false (so /quiz -> quiz.html)
@@ -35,7 +38,7 @@ The root policy pages and the `content/legal/*.md` drafts are **parallel copies*
 
 ## Editing gotcha: the HTML is minified
 
-The root pages are single-file and machine-dense — all CSS sits on one line and the JS on a handful of very long lines. Line counts are meaningless here; anchor edits on distinctive substrings, and expect a single "line" to be thousands of characters. `api/lead.js` is the only readably-formatted source.
+The root pages are single-file and machine-dense — all CSS sits on one line and the JS on a handful of very long lines. Line counts are meaningless here; anchor edits on distinctive substrings, and expect a single "line" to be thousands of characters. `api/lead.js`, `api/deliver.js` and `deliver.html` are the only readably-formatted sources (deliberately kept that way — see their own files).
 
 ## Running & deploying
 
@@ -45,7 +48,7 @@ Use that rather than `npx serve .` or `python -m http.server`: the pages link to
 
 Opening the `.html` files directly over `file://` has the same problem, and worse — the funnel itself still works (`/api/lead` no-ops locally and the quiz swallows the fetch error), but you cannot navigate between pages.
 
-Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless function; `vercel.json` gives clean URLs. Server-side secrets (Klaviyo key, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
+Deploy target is **Vercel**. `api/lead.js` and `api/deliver.js` are auto-detected as serverless functions; `vercel.json` gives clean URLs. Server-side secrets (Klaviyo key, Razorpay secret, etc.) are set in Vercel's Environment Variables — names are in `.env.example`; never commit values.
 
 **Deployment reality (important — not yet ideal):**
 - This repo is **NOT git-connected to Vercel**, so commits here do **not** auto-deploy. The durable fix is to Import the repo in the Vercel dashboard (git-connect); until then, deploys are manual.
@@ -61,6 +64,8 @@ Deploy target is **Vercel**. `api/lead.js` is auto-detected as a serverless func
 
 Current shape — **single product, no scoring**. `CONFIG.product` is one product and `CONFIG.concern` is one concern; answers are plain `{l:"label"}` options with no weights, and there is no ranking step. The "personalised match" screen is copy that reflects `CONFIG.concern.goalTag`, not a computed recommendation. Answer labels are still collected and sent with the lead, so they are useful for segmentation in the ESP. If a second product line is ever added, the scoring layer has to be written — it isn't there to extend.
 
+`quiz.html` also computes a separate, concrete match via `matchProtocol(answers)` — which of the four `content/protocol/*.md` guides a buyer gets, stored as `state.protocol` and sent as `attr.protocol` with the lead. This is distinct from the `CONFIG.concern` copy above: `matchProtocol()` is real branching logic (see `content/protocol/README.md` → "How matching works"), not a single config value.
+
 The storefront pages (`index.html`, `product.html`) use a much smaller inline **`SHOP`** object (`{domain, variants}`) plus a `shopLink()` helper instead of `CONFIG`.
 
 The homepage is a **category hub** styled as an apothecary label (ink/amber palette, real bottle + ingredient photography — see credits in each page's footer): one live category (Hair & Scalp) plus a "More categories, in formulation" section for the rest (beard, body, skin, rituals, gifting). Those call `notifyMe(category)`, which opens an inline waitlist modal — email + DPDP consent — and POSTs to `/api/lead` with `track: "waitlist-<category>"` and `attr.interest` set. Waitlist signups therefore land in the same ESP list as quiz leads, segmented by interest.
@@ -71,7 +76,7 @@ Don't revert this to a redirect into the quiz: the quiz is hair-specific through
 
 "Add to cart" does not process payment here — it redirects somewhere that does. The handlers (`shopLink()` on the store pages, `addToCart()` in the quiz) try two routes in order:
 
-1. **A payment link** — `SHOP.payLinks[key]` / `CONFIG.product.payLink`. Intended for a **Razorpay Payment Link or Payment Page**, which has no monthly platform fee, only a per-transaction cut. This is the preferred route and the reason the site does not require Shopify.
+1. **A payment link** — `SHOP.payLinks[key]` / `CONFIG.product.payLink`. Intended for a **Razorpay Payment Link or Payment Page**, which has no monthly platform fee, only a per-transaction cut. This is the preferred route and the reason the site does not require Shopify. **Its Redirect URL must be set to `/deliver`** (Razorpay dashboard → the link → Settings) for post-purchase delivery to work automatically — see "Delivery" below and `SETUP.md`.
 2. **A Shopify cart permalink** — `https://{domain}/cart/{variantId}:1`, used only if `domain` + `variantId` are set and no payment link is.
 
 With neither set, the buttons `alert()` a "checkout not connected" prompt. The owner is cost-sensitive, so prefer the payment-link path when extending this; don't reintroduce a hard Shopify dependency without asking.
@@ -84,6 +89,12 @@ Two deliberate fail-open behaviours worth knowing before debugging "missing lead
 
 Marketing attribution (`utm_*`, `fbclid`, `ref`, `interest`) is captured client-side into `localStorage` (`ojasAttr`, merged across visits) and sent with the lead. Meta Pixel loads only if `CONFIG.pixelId` is set; `track()` is a no-op otherwise.
 
+## Delivery (post-purchase)
+
+`api/deliver.js` + `deliver.html` release the paid digital protocol after checkout — see `PRODUCT.md`'s "Delivery" section for the full design rationale. Short version: the Razorpay Payment Link redirects the buyer's browser to `/deliver?<razorpay's signed params>` after a successful payment; `deliver.html` reads the matched protocol slug from the `ojasLead` record already in `localStorage` (written during the quiz, see above) and asks `/api/deliver` to verify Razorpay's HMAC signature against `RAZORPAY_KEY_SECRET` before releasing that protocol's content from `content/protocol/*.md`.
+
+Unlike `api/lead.js`, this **fails closed, not open**: with `RAZORPAY_KEY_SECRET` unset (not yet connected) or a bad/missing signature, it returns a holding message rather than the content — a paid good shouldn't leak just because a dependency isn't wired up yet. Keep it that way; don't relax this the way `api/lead.js` deliberately relaxes lead-forwarding failures.
+
 ## Placeholders convention
 
 Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: ""`, `domain: ""`) is a **deliberate fill-later dependency**, not a bug. The full list of what to fill is in `SETUP.md` (product facts, prices, Shopify variant IDs, Pixel ID, Klaviyo keys, domain, GST/entity/grievance-officer details).
@@ -94,7 +105,7 @@ Anything in `[BRACKETS]` or an empty config string (`pixelId: ""`, `variantId: "
 
 ## SEO baseline (added — keep in sync when adding pages)
 
-Every page carries a `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:title`, `og:description`), a `twitter:card`, and an inline-SVG data-URI favicon (a teardrop on ink `#211A13` / amber `#A85F10`, no external asset — matches the apothecary-label redesign). `robots.txt` allows all crawlers. There is **no `sitemap.xml` yet** — it needs absolute URLs, and no domain is purchased yet (see `SETUP.md`); add one once the domain is live. There is **no `og:image`** yet either — real bottle and ingredient photography now exists (credited in each page's footer), so this is just not done, not blocked; add one to every page's `<head>`.
+Every page carries a `<meta name="description">`, Open Graph tags (`og:type`, `og:site_name`, `og:title`, `og:description`), a `twitter:card`, and an inline-SVG data-URI favicon (a teardrop on ink `#211A13` / amber `#A85F10`, no external asset — matches the apothecary-label redesign). `robots.txt` allows all crawlers. There is **no `sitemap.xml` yet** — it needs absolute URLs, and no domain is purchased yet (see `SETUP.md`); add one once the domain is live. There is **no `og:image`** yet either — real bottle and ingredient photography now exists (credited in each page's footer), so this is just not done, not blocked; add one to every page's `<head>`. `deliver.html` carries `<meta name="robots" content="noindex">` instead — it's a per-purchase utility page, not something that should show up in search.
 
 ## The hard constraint: claims compliance
 
@@ -103,7 +114,7 @@ This is legal, not stylistic — India's **Drugs & Magic Remedies (Objectionable
 - **Never** write: regrows hair, stops hair fall / treats hair loss, reverses greying, treats dandruff or any condition, cures/treats obesity, "clinically proven" (without a study). Prescription-drug DTC advertising is prohibited outright.
 - **Keep to** support/appearance framing: nourishes/comforts the scalp, conditions dry hair, softness & shine, helps hair *look* fuller and healthier, helps reduce the *look* of breakage, clears buildup without stripping.
 - Lead capture **must** keep its explicit consent checkbox (DPDP Act 2023); health-adjacent data needs consent. The server enforces this too — don't relax the `consent !== true` check.
-- The result screen carries a "not a medicine / not intended to diagnose, treat, cure or prevent any disease" disclaimer. Keep it on any new result or product surface.
+- The result screen carries a "not a medicine / not intended to diagnose, treat, cure or prevent any disease" disclaimer. Keep it on any new result or product surface. (The four `content/protocol/*.md` guides carry it too — see `content/protocol/README.md`.)
 - New product categories must stay cosmetic. Anything framed as restoration, treatment, or clinical care — the model most telehealth sites use — is not available to this brand in India.
 
 When in doubt, describe what a product *is* and how it makes hair *look/feel* — never what it cures.

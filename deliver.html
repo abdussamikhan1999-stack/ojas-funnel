@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Your protocol — Ojas</title>
+<meta name="description" content="Your personalised Ojas Hair & Scalp Protocol, delivered after purchase.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%232f6d4f'/%3E%3Cpath d='M32 12c10 8 16 18 16 27a16 16 0 01-32 0c0-9 6-19 16-27z' fill='%23faf7f2'/%3E%3C/svg%3E">
+<style>
+:root{--bg:#fbf6ee;--card:#fff;--ink:#241d16;--muted:#6f6459;--line:#eae0d1;--leaf:#2f6d4f}
+@media(prefers-color-scheme:dark){:root{--bg:#14110c;--card:#1d1913;--ink:#f1ebe0;--muted:#b0a595;--line:#2c261d;--leaf:#5fb187}}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--bg);color:var(--ink);font-family:"Inter",system-ui,-apple-system,sans-serif;line-height:1.7}
+.wrap{max-width:720px;margin:0 auto;padding:0 24px}a{color:var(--leaf)}
+nav{border-bottom:1px solid var(--line)}.nav-in{max-width:720px;margin:0 auto;padding:16px 24px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-family:Georgia,serif;font-size:20px;font-weight:700;color:var(--ink);text-decoration:none}
+main{padding:40px 0 60px}h1{font-family:Georgia,serif;font-weight:600;font-size:clamp(26px,5vw,34px);margin-bottom:6px}
+h2{font-family:Georgia,serif;font-weight:600;font-size:19px;margin:26px 0 8px}
+p,li{color:var(--muted);font-size:15px;margin-bottom:10px}ul{padding-left:22px}
+.note{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--muted);margin-bottom:24px}
+.err{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:18px;font-size:15px}
+.spin{color:var(--muted);font-size:15px}
+footer{border-top:1px solid var(--line);padding:22px 0;font-size:13px;color:var(--muted)}
+</style></head><body>
+<nav><div class="nav-in"><a href="/" class="brand">Ojas</a><a href="/">← Home</a></div></nav>
+<main class="wrap" id="out"><p class="spin">Checking your purchase…</p></main>
+<footer class="wrap">Questions about your protocol? <a href="contact">Contact us</a>.</footer>
+<script>
+function $(id){return document.getElementById(id);}
+function esc(s){return s.replace(/[&<>]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;"}[c];});}
+
+// Minimal markdown -> HTML. The content is our own authored copy (see
+// content/protocol/*.md), not user input, but inputs are still escaped
+// before any markup is applied — skipped: a real markdown library, this
+// repo has no build step/dependencies (see CLAUDE.md); add one if the
+// protocol content ever needs richer formatting than headers/bold/lists.
+function renderMarkdown(md){
+  // Markdown paragraphs/list-items soft-wrap across lines (see
+  // content/protocol/*.md), so continuation lines must join the current
+  // block rather than each starting a new <p>/<li>.
+  var lines=esc(md).split("\n"),html="",inList=false,buf=null,bufType=null;
+  function bold(s){return s.replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");}
+  function flush(){ if(buf===null) return; html += (bufType==="li" ? "<li>" : "<p>") + bold(buf) + (bufType==="li" ? "</li>" : "</p>"); buf=null; bufType=null; }
+  lines.forEach(function(line){
+    var m;
+    if((m=line.match(/^##\s+(.*)/))){ flush(); if(inList){html+="</ul>";inList=false;} html+="<h2>"+bold(m[1])+"</h2>"; }
+    else if((m=line.match(/^#\s+(.*)/))){ flush(); if(inList){html+="</ul>";inList=false;} html+="<h1>"+bold(m[1])+"</h1>"; }
+    else if((m=line.match(/^-\s+(.*)/))){ flush(); if(!inList){html+="<ul>";inList=true;} buf=m[1]; bufType="li"; }
+    else if(line.trim()===""){ flush(); if(inList){html+="</ul>";inList=false;} }
+    else { if(buf===null){ buf=line.trim(); bufType="p"; } else { buf+=" "+line.trim(); } }
+  });
+  flush();
+  if(inList) html+="</ul>";
+  return html;
+}
+
+function readLocalLead(){
+  try { return JSON.parse(localStorage.getItem("ojasLead")||"null"); } catch(e){ return null; }
+}
+
+function render(target, html){ target.innerHTML = html; }
+
+(function(){
+  var out=$("out");
+  var qs=new URLSearchParams(location.search);
+  var razorpayParams=["razorpay_payment_id","razorpay_payment_link_id","razorpay_payment_link_reference_id","razorpay_payment_link_status","razorpay_signature"];
+  var hasPaymentParams=razorpayParams.some(function(k){return qs.get(k);});
+
+  if(!hasPaymentParams){
+    render(out,'<div class="err"><h1>No purchase found</h1><p>This page only shows your protocol right after a successful purchase. If you\'ve already bought and lost this link, email <a href="contact">support</a> with your purchase email and we\'ll resend it.</p><p><a href="quiz">Take the quiz</a> to get matched, then purchase from the result screen.</p></div>');
+    return;
+  }
+
+  var lead=readLocalLead();
+  var protocol=(lead && lead.attr && lead.attr.protocol) || qs.get("protocol") || "";
+  var deliverUrl="/api/deliver?"+razorpayParams.map(function(k){return k+"="+encodeURIComponent(qs.get(k)||"");}).join("&")+(protocol?"&protocol="+encodeURIComponent(protocol):"");
+
+  fetch(deliverUrl).then(function(r){ return r.json().then(function(body){ return {status:r.status, body:body}; }); }).then(function(res){
+    if(res.status===200 && res.body.ok){
+      var note = (lead && lead.attr && lead.attr.protocol) ? "" : '<div class="note">We couldn\'t find your quiz match on this device, so here\'s the general protocol. Email <a href="contact">support</a> with your purchase email for your exact match.</div>';
+      render(out, note + renderMarkdown(res.body.markdown));
+    } else if(res.status===503){
+      render(out,'<div class="err"><h1>Thanks for your purchase!</h1><p>Your protocol is on its way — delivery is being finalised on our end right now. Email <a href="contact">support</a> with your purchase email if you don\'t hear from us within 24 hours.</p></div>');
+    } else {
+      render(out,'<div class="err"><h1>Couldn\'t verify your purchase</h1><p>If you just paid, email <a href="contact">support</a> with your purchase email/receipt and we\'ll send your protocol directly.</p></div>');
+    }
+  }).catch(function(){
+    render(out,'<div class="err"><h1>Something went wrong</h1><p>Email <a href="contact">support</a> with your purchase email/receipt and we\'ll send your protocol directly.</p></div>');
+  });
+})();
+</script>
+</body></html>
