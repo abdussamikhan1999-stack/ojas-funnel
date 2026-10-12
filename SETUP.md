@@ -45,7 +45,7 @@ Everything that's **built** vs. the **dependencies to fill in later** (API keys,
 
 ### Product facts (fill in quiz.html CONFIG + copy)
 - [ ] Real product names, herbs/ingredients, sizes, prices, launch offer.
-- [ ] Product photography + logo + brand fonts. (Once photography exists, add `og:image` to every page's `<head>` — omitted for now since there's no real image to point at.)
+- [ ] Product photography + logo + brand fonts. (`og:image` is now set on the six main pages from `images/og.jpg`.)
 
 ### Later
 - [ ] Affiliate app (GoAffPro / UpPromote) for commission selling.
