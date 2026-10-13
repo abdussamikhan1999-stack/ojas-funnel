@@ -19,6 +19,7 @@ about|faq|contact.html               Marketing pages (served at /about, …)
 privacy|terms|refund|shipping.html   Rendered policy pages (served at /privacy, …)
 api/lead.js     Vercel serverless function: receives quiz leads, forwards to ESP
 api/deliver.js  Vercel serverless function: verifies a Razorpay payment, releases the paid protocol
+api/offer.js    Vercel serverless function: counts paid ₹249 orders so the quiz can close the founding offer at 200
 preview.py      Local dev server that reproduces vercel.json's clean URLs
 content/legal/  Markdown source/drafts for the four policy pages
 content/copy/   Storefront copy

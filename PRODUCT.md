@@ -45,10 +45,14 @@ the protocol and links to the oil; `content/email/klaviyo-flows.md` covers both.
   (`CONFIG.pixelId`/Klaviyo/`payLink` all still empty), so a hardcoded date
   would go stale before the funnel even runs. `CONFIG.launchDate` in
   `quiz.html` stays empty until launch; the 14-day window is 14 days from
-  whatever gets filled in there. The 200-buyer cap has no live counter
-  (this repo has no order-tracking backend) — enforce it manually by
-  swapping `CONFIG.product.price` to 399 (and dropping the strikethrough)
-  once either condition is hit.
+  whatever gets filled in there. Both conditions are now automatic
+  (2026-10-13): `api/offer.js` counts captured ₹249 payments in Razorpay
+  since `launchDate`, and the quiz compares `launchDate` + 14 days with
+  today. When either is hit, the result screen shows ₹399 and sends buyers
+  to `CONFIG.product.regularPayLink`. Until that ₹399 link exists (or the
+  Razorpay keys aren't set), it keeps the founding price and link, so the
+  shown price always matches the charge. The homepage's "₹249 / ₹399"
+  line is static copy and still needs a hand edit when the offer ends.
 - **Channel:** Meta/Instagram ads → quiz (lead capture + personalization) →
   Razorpay checkout → automatic digital delivery (see below) + Klaviyo
   nurture. Still not live — `CONFIG.pixelId` and Klaviyo keys are empty
