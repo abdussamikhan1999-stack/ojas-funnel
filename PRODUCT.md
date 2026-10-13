@@ -6,6 +6,11 @@ sidesteps the unresolved COGS/inventory blocker entirely and lets the
 funnel go live fast. The physical oil can come back later as an upsell
 once its economics are actually known; it isn't the primary offer for now.
 
+**Update 2026-10-12:** the owner chose to sell **both**. The ₹249 protocol stays
+the lead offer (quiz, homepage hero CTA). The oil stays on `product.html` as a
+second product at ₹299 / 50 mL (₹259 on subscription). The homepage hero sells
+the protocol and links to the oil; `content/email/klaviyo-flows.md` covers both.
+
 - **Type:** digital product — a personalized PDF/email-delivered hair &
   scalp protocol.
 - **Price:** ₹399 regular, **₹249 founding-cohort launch price** (see
